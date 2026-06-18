@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>管理端 · 健身私教管理系统</title>
+  <style>
+    :root{--bg:#f5f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--line:#e5e7eb;--primary:#2563eb;--primary-soft:#dbeafe;--shadow:0 12px 32px rgba(15,23,42,.08);--radius:18px}
+    *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;background:linear-gradient(180deg,#eef4ff 0%,var(--bg) 32%,var(--bg) 100%);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(16px);background:rgba(245,247,251,.86);border-bottom:1px solid rgba(229,231,235,.85)}
+    .topbar{max-width:1240px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
+    h1{font-size:18px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .user-badge{background:#fef3c7;color:#92400e;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:800}
+    button{border:none;border-radius:12px;padding:9px 14px;font-weight:800;cursor:pointer;transition:.18s;background:#111827;color:#fff;font-family:inherit;font-size:13px}
+    button:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(15,23,42,.12)}
+    button.secondary{background:var(--card);color:var(--text);border:1px solid var(--line)}
+    button.primary{background:var(--primary)}button.danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+    button.success{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+    button.small{padding:6px 10px;font-size:12px;border-radius:10px}
+    .tabs{max-width:1240px;margin:0 auto;padding:0 18px;display:flex;gap:4px;border-bottom:1px solid var(--line)}
+    .tab{padding:12px 18px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
+    .tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .tab-content{display:none}.tab-content.active{display:block}
+    main{max-width:1240px;margin:0 auto;padding:22px 18px 70px}
+    .card{background:rgba(255,255,255,.94);border:1px solid rgba(229,231,235,.95);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+    .card h2{font-size:17px;margin:0 0 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .pill{display:inline-flex;padding:6px 10px;border-radius:999px;background:var(--primary-soft);color:#1d4ed8;font-size:12px;font-weight:900}
+    label{font-size:12px;color:var(--muted);font-weight:800;display:block;margin-bottom:5px}
+    input,select{border:1px solid var(--line);border-radius:12px;padding:10px 11px;font:inherit;background:#fff;outline:none}
+    input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(147,197,253,.12)}
+    input.w100,select.w100{width:100%}
+    .form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .form-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    /* overview stats */
+    .overview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+    .ov-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+    .ov-card .label{font-size:12px;color:var(--muted);font-weight:800}.ov-card .num{font-size:32px;font-weight:950;margin-top:8px;color:var(--primary)}
+    .ov-card .sub{font-size:12px;color:var(--muted);margin-top:4px}
+    /* table */
+    .data-table{width:100%;border-collapse:collapse}
+    .data-table th{text-align:left;padding:10px 12px;font-size:12px;font-weight:800;color:var(--muted);background:#f9fafb;border-bottom:1px solid var(--line)}
+    .data-table td{padding:11px 12px;font-size:13px;border-bottom:1px solid var(--line);vertical-align:middle}
+    .data-table tr:last-child td{border-bottom:none}
+    .data-table tr:hover td{background:#f9fafb}
+    .status-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}
+    .status-pending{background:#fef3c7;color:#92400e}.status-confirmed{background:#dbeafe;color:#1d4ed8}
+    .status-completed{background:#dcfce7;color:#166534}.status-cancelled{background:#f3f4f6;color:#6b7280}
+    .role-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}
+    .role-admin{background:#fce7f3;color:#9d174d}.role-coach{background:#dbeafe;color:#1d4ed8}.role-student{background:#dcfce7;color:#166534}
+    /* modal */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+    .modal-bg.open{display:flex}
+    .modal{background:#fff;border-radius:20px;padding:28px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(15,23,42,.28)}
+    .modal h3{margin:0 0 20px;font-size:17px}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+    .mf{margin-bottom:14px}
+    .empty{text-align:center;color:var(--muted);padding:28px;font-size:14px}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end}
+    .filters>div{display:flex;flex-direction:column;gap:4px}
+    .toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:12px 14px;border-radius:14px;box-shadow:0 12px 24px rgba(15,23,42,.25);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:300;font-size:13px}
+    .toast.show{opacity:1;transform:translateY(0)}
+    @media(max-width:860px){.overview-grid,.form-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){.overview-grid{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div class="brand"><div class="logo">🏋️</div><div><h1>健身私教管理系统</h1><div class="sub">管理端</div></div></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="user-badge" id="userBadge">加载中…</span>
+      <button class="secondary small" onclick="logout()">退出</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('overview')">📊 概览</div>
+    <div class="tab" onclick="switchTab('coaches')">👨‍🏫 教练管理</div>
+    <div class="tab" onclick="switchTab('students')">👥 学员管理</div>
+    <div class="tab" onclick="switchTab('bookings')">📅 所有约课</div>
+    <div class="tab" onclick="switchTab('logs')">📋 训练记录</div>
+  </div>
+</header>
+
+<!-- 概览 -->
+<div id="tab-overview" class="tab-content active">
+<main>
+  <div class="overview-grid">
+    <div class="ov-card"><div class="label">教练总数</div><div class="num" id="ovCoach">—</div><div class="sub">在职教练</div></div>
+    <div class="ov-card"><div class="label">学员总数</div><div class="num" id="ovStudent">—</div><div class="sub">注册学员</div></div>
+    <div class="ov-card"><div class="label">本月约课</div><div class="num" id="ovBooking">—</div><div class="sub">含所有状态</div></div>
+    <div class="ov-card"><div class="label">本月训练记录</div><div class="num" id="ovLog">—</div><div class="sub">教练已填入</div></div>
+  </div>
+  <div class="card">
+    <h2>待确认约课</h2>
+    <div id="pendingOverview"><div class="empty">加载中…</div></div>
+  </div>
+</main>
+</div>
+
+<!-- 教练管理 -->
+<div id="tab-coaches" class="tab-content">
+<main>
+  <div class="card">
+    <h2>教练列表 <button class="primary small" onclick="openAddUser('coach')">＋ 新增教练</button></h2>
+    <table class="data-table" id="coachTable"><thead><tr><th>姓名</th><th>手机号</th><th>加入时间</th><th>操作</th></tr></thead><tbody id="coachBody"><tr><td colspan="4" class="empty">加载中…</td></tr></tbody></table>
+  </div>
+</main>
+</div>
+
+<!-- 学员管理 -->
+<div id="tab-students" class="tab-content">
+<main>
+  <div class="card">
+    <h2>学员列表 <button class="primary small" onclick="openAddUser('student')">＋ 新增学员</button></h2>
+    <table class="data-table" id="studentTable"><thead><tr><th>姓名</th><th>手机号</th><th>加入时间</th><th>操作</th></tr></thead><tbody id="studentBody"><tr><td colspan="4" class="empty">加载中…</td></tr></tbody></table>
+  </div>
+</main>
+</div>
+
+<!-- 所有约课 -->
+<div id="tab-bookings" class="tab-content">
+<main>
+  <div class="card">
+    <h2>所有约课</h2>
+    <div class="filters">
+      <div><label>状态</label><select id="bStatusFilter" onchange="loadAllBookings()">
+        <option value="">全部</option><option value="pending">待确认</option>
+        <option value="confirmed">已确认</option><option value="completed">已完课</option>
+        <option value="cancelled">已取消</option>
+      </select></div>
+      <div><label>日期</label><input type="date" id="bDateFilter" onchange="loadAllBookings()"></div>
+      <button class="secondary small" onclick="loadAllBookings()">刷新</button>
+    </div>
+    <table class="data-table"><thead><tr><th>学员</th><th>教练</th><th>日期</th><th>时间段</th><th>状态</th><th>备注</th><th>操作</th></tr></thead>
+    <tbody id="bookingBody"><tr><td colspan="7" class="empty">加载中…</td></tr></tbody></table>
+  </div>
+</main>
+</div>
+
+<!-- 训练记录 -->
+<div id="tab-logs" class="tab-content">
+<main>
+  <div class="card">
+    <h2>训练记录</h2>
+    <div class="filters">
+      <div><label>月份</label><input type="month" id="logMonthFilter" onchange="loadAllLogs()"></div>
+      <button class="secondary small" onclick="loadAllLogs()">刷新</button>
+    </div>
+    <table class="data-table"><thead><tr><th>日期</th><th>学员</th><th>教练</th><th>主题</th><th>耗时</th><th>消耗</th><th>动作数</th></tr></thead>
+    <tbody id="logBody"><tr><td colspan="7" class="empty">加载中…</td></tr></tbody></table>
+  </div>
+</main>
+</div>
+
+<!-- 新增用户 Modal -->
+<div class="modal-bg" id="addUserModal">
+  <div class="modal">
+    <h3 id="modalTitle">新增教练</h3>
+    <div class="mf"><label>姓名</label><input class="w100" id="newName" placeholder="请输入姓名"></div>
+    <div class="mf"><label>手机号（用于登录）</label><input class="w100" id="newPhone" type="tel" placeholder="请输入手机号"></div>
+    <div class="mf"><label>初始密码</label><input class="w100" id="newPwd" type="password" placeholder="请设置初始密码"></div>
+    <input type="hidden" id="newRole">
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal()">取消</button>
+      <button class="primary" onclick="submitAddUser()">确认新增</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+let me=null;
+function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function statusLabel(s){return{pending:'待确认',confirmed:'已确认',completed:'已完课',cancelled:'已取消'}[s]||s}
+async function api(path,opt={}){const r=await fetch('/api'+path,{headers:{'Content-Type':'application/json'},...opt});const d=await r.json();if(!r.ok)throw new Error(d.error||'请求失败');return d}
+async function logout(){await api('/auth/logout',{method:'POST'});location.href='/login.html'}
+
+const tabNames=['overview','coaches','students','bookings','logs'];
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabNames[i]===name));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='overview')loadOverview();
+  if(name==='coaches')loadUsers('coach');
+  if(name==='students')loadUsers('student');
+  if(name==='bookings')loadAllBookings();
+  if(name==='logs')loadAllLogs();
+}
+
+async function init(){
+  try{
+    me=await api('/auth/me');
+    if(me.role!=='admin'){location.href='/login.html';return}
+    document.getElementById('userBadge').textContent='👑 '+me.name+'（管理员）';
+    loadOverview();
+  }catch(e){location.href='/login.html'}
+}
+
+async function loadOverview(){
+  try{
+    const [coaches,students,bookings,logs]=await Promise.all([
+      api('/users?role=coach'),api('/users?role=student'),api('/bookings'),api('/logs')
+    ]);
+    document.getElementById('ovCoach').textContent=coaches.length;
+    document.getElementById('ovStudent').textContent=students.length;
+    const month=new Date().toISOString().slice(0,7);
+    document.getElementById('ovBooking').textContent=bookings.filter(b=>b.date?.startsWith(month)).length;
+    document.getElementById('ovLog').textContent=logs.filter(l=>l.date?.startsWith(month)).length;
+    const pending=bookings.filter(b=>b.status==='pending');
+    document.getElementById('pendingOverview').innerHTML=pending.length
+      ?`<table class="data-table"><thead><tr><th>学员</th><th>教练</th><th>日期</th><th>时间段</th><th>备注</th><th>操作</th></tr></thead><tbody>
+        ${pending.map(b=>`<tr><td>${esc(b.student_name)}</td><td>${esc(b.coach_name)}</td><td>${b.date}</td><td>${b.time_slot}</td><td>${esc(b.note||'—')}</td>
+        <td><button class="success small" onclick="updBooking(${b.id},'confirmed')">确认</button> <button class="danger small" onclick="updBooking(${b.id},'cancelled')">拒绝</button></td></tr>`).join('')}
+        </tbody></table>`
+      :'<div class="empty">暂无待确认约课</div>';
+  }catch(e){toast('加载概览失败')}
+}
+
+async function loadUsers(role){
+  const bodyId=role==='coach'?'coachBody':'studentBody';
+  try{
+    const list=await api('/users?role='+role);
+    document.getElementById(bodyId).innerHTML=list.length
+      ?list.map(u=>`<tr>
+        <td><b>${esc(u.name)}</b></td>
+        <td>${esc(u.phone||'—')}</td>
+        <td>${u.created_at?.slice(0,10)||'—'}</td>
+        <td><button class="secondary small" onclick="resetPwd(${u.id})">重置密码</button> <button class="danger small" onclick="delUser(${u.id},'${esc(u.name)}')">删除</button></td>
+      </tr>`).join('')
+      :`<tr><td colspan="4" class="empty">暂无${role==='coach'?'教练':'学员'}</td></tr>`;
+  }catch(e){toast('加载失败')}
+}
+
+async function loadAllBookings(){
+  const status=document.getElementById('bStatusFilter').value;
+  const date=document.getElementById('bDateFilter').value;
+  let url='/bookings?';
+  if(status)url+='status='+status+'&';
+  if(date)url+='date='+date;
+  try{
+    const list=await api(url);
+    document.getElementById('bookingBody').innerHTML=list.length
+      ?list.map(b=>`<tr>
+        <td><b>${esc(b.student_name)}</b></td><td>${esc(b.coach_name)}</td>
+        <td>${b.date}</td><td>${b.time_slot}</td>
+        <td><span class="status-badge status-${b.status}">${statusLabel(b.status)}</span></td>
+        <td>${esc(b.note||'—')}</td>
+        <td>${b.status==='pending'?`<button class="success small" onclick="updBooking(${b.id},'confirmed')">确认</button>`:''}</td>
+      </tr>`).join('')
+      :'<tr><td colspan="7" class="empty">暂无数据</td></tr>';
+  }catch(e){toast('加载失败')}
+}
+
+async function loadAllLogs(){
+  const month=document.getElementById('logMonthFilter').value;
+  try{
+    const list=await api('/logs'+(month?'?month='+month:''));
+    document.getElementById('logBody').innerHTML=list.length
+      ?list.map(l=>`<tr>
+        <td>${l.date}</td><td><b>${esc(l.student_name)}</b></td><td>${esc(l.coach_name)}</td>
+        <td>${esc(l.title||'—')}</td><td>${l.duration||'—'} min</td><td>${l.calories||'—'} kcal</td>
+        <td>${(l.exercises||[]).length}</td>
+      </tr>`).join('')
+      :'<tr><td colspan="7" class="empty">暂无数据</td></tr>';
+  }catch(e){toast('加载失败')}
+}
+
+async function updBooking(id,status){
+  try{await api('/bookings/'+id+'/status',{method:'PUT',body:JSON.stringify({status})});toast('已更新');loadOverview();loadAllBookings();}
+  catch(e){toast(e.message)}
+}
+
+function openAddUser(role){
+  document.getElementById('modalTitle').textContent=role==='coach'?'新增教练':'新增学员';
+  document.getElementById('newRole').value=role;
+  ['newName','newPhone','newPwd'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('addUserModal').classList.add('open');
+}
+function closeModal(){document.getElementById('addUserModal').classList.remove('open')}
+
+async function submitAddUser(){
+  const name=document.getElementById('newName').value.trim();
+  const phone=document.getElementById('newPhone').value.trim();
+  const password=document.getElementById('newPwd').value;
+  const role=document.getElementById('newRole').value;
+  if(!name||!phone||!password){toast('请填写完整信息');return}
+  try{
+    await api('/users',{method:'POST',body:JSON.stringify({name,phone,password,role})});
+    toast('新增成功');closeModal();loadUsers(role);
+  }catch(e){toast(e.message)}
+}
+
+async function resetPwd(id){
+  const pwd=prompt('请输入新密码（至少6位）');
+  if(!pwd||pwd.length<6){toast('密码太短');return}
+  try{await api('/users/'+id+'/password',{method:'PUT',body:JSON.stringify({password:pwd})});toast('密码已重置');}
+  catch(e){toast(e.message)}
+}
+
+async function delUser(id,name){
+  if(!confirm(`确定删除用户「${name}」吗？此操作不可恢复。`))return;
+  try{await api('/users/'+id,{method:'DELETE'});toast('已删除');loadUsers('coach');loadUsers('student');}
+  catch(e){toast(e.message)}
+}
+
+init();
+</script>
+</body>
+</html>
