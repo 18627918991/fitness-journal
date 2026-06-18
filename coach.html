@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>教练端 · 健身私教管理系统</title>
+  <style>
+    :root{--bg:#f5f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--line:#e5e7eb;--primary:#2563eb;--primary-soft:#dbeafe;--success:#16a34a;--danger:#dc2626;--warning:#f59e0b;--shadow:0 12px 32px rgba(15,23,42,.08);--radius:18px}
+    *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;background:linear-gradient(180deg,#eef4ff 0%,var(--bg) 32%,var(--bg) 100%);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(16px);background:rgba(245,247,251,.86);border-bottom:1px solid rgba(229,231,235,.85)}
+    .topbar{max-width:1240px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 10px 24px rgba(37,99,235,.28)}
+    h1{font-size:18px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .header-right{display:flex;align-items:center;gap:10px}
+    .user-badge{background:var(--primary-soft);color:#1d4ed8;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:800}
+    button,.btn{border:none;border-radius:12px;padding:9px 14px;font-weight:800;cursor:pointer;transition:.18s ease;background:#111827;color:#fff;font-family:inherit;font-size:13px}
+    button:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(15,23,42,.12)}
+    button.secondary{background:var(--card);color:var(--text);border:1px solid var(--line)}
+    button.primary{background:var(--primary)}button.danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+    button.success{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+    button.warning{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+    button.small{padding:6px 10px;font-size:12px;border-radius:10px}
+    /* Tabs */
+    .tabs{max-width:1240px;margin:0 auto;padding:0 18px;display:flex;gap:4px;border-bottom:1px solid var(--line);background:transparent}
+    .tab{padding:12px 18px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
+    .tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .tab-content{display:none}.tab-content.active{display:block}
+    main{max-width:1240px;margin:0 auto;padding:22px 18px 70px}
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+    .card{background:rgba(255,255,255,.94);border:1px solid rgba(229,231,235,.95);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .card h2{font-size:17px;margin:0 0 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--primary-soft);color:#1d4ed8;font-size:12px;font-weight:900;white-space:nowrap}
+    label{font-size:12px;color:var(--muted);font-weight:800;display:block;margin-bottom:5px}
+    input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 11px;font:inherit;background:#fff;outline:none}
+    input:focus,select:focus,textarea:focus{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(147,197,253,.22)}
+    textarea{min-height:80px;resize:vertical}
+    .form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .form-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .set-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+    .footer-note{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.7}
+    .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .stat,.mini{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+    .stat .name,.mini .name{font-size:12px;color:var(--muted);font-weight:900}
+    .stat .num,.mini .num{font-size:22px;font-weight:950;margin-top:6px}
+    .bar-wrap{height:9px;background:#eef2ff;border-radius:999px;overflow:hidden;margin-top:10px}
+    .bar{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:999px;width:0%}
+    .exercise-list{display:flex;flex-direction:column;gap:12px}
+    .exercise{border:1px solid var(--line);border-radius:18px;background:#fff;overflow:hidden}
+    .exercise-head{padding:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,#f9fafb)}
+    .ex-title{font-size:16px;font-weight:950}.ex-meta{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.7}
+    .tag{display:inline-flex;padding:4px 8px;border-radius:999px;background:#f3f4f6;color:#374151;font-size:12px;font-weight:800;margin:2px}
+    .exercise-body{padding:14px}
+    table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid var(--line);padding:8px;text-align:center;font-size:13px}
+    th{color:var(--muted);font-size:12px;background:#f9fafb}td input{padding:8px;border-radius:10px;text-align:center}
+    .empty{text-align:center;color:var(--muted);border:1px dashed #cbd5e1;border-radius:18px;padding:24px 16px;background:#fff}
+    /* Booking cards */
+    .booking-item{border:1px solid var(--line);border-radius:16px;background:#fff;padding:14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-bottom:10px}
+    .booking-title{font-weight:950;font-size:15px}.booking-meta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.8}
+    .booking-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+    .status-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}
+    .status-pending{background:#fef3c7;color:#92400e}.status-confirmed{background:#dbeafe;color:#1d4ed8}
+    .status-completed{background:#dcfce7;color:#166534}.status-cancelled{background:#f3f4f6;color:#6b7280}
+    /* Student list */
+    .student-item{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .student-name{font-weight:900;font-size:15px}.student-meta{font-size:12px;color:var(--muted);margin-top:2px}
+    .toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:12px 14px;border-radius:14px;box-shadow:0 12px 24px rgba(15,23,42,.25);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s ease;z-index:100;font-size:13px}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .section-header h2{font-size:17px;margin:0}
+    /* Pool picker */
+    .pool-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+    .pool-chip{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px;cursor:pointer;transition:.15s;text-align:left}
+    .pool-chip:hover{border-color:var(--primary);box-shadow:0 6px 16px rgba(37,99,235,.12);transform:translateY(-1px)}
+    .pool-chip .pc-name{font-weight:900;font-size:14px;display:flex;align-items:center;gap:6px}
+    .pool-chip .pc-meta{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.6}
+    .pool-chip .pc-def{display:inline-block;margin-top:6px;font-size:11px;font-weight:800;color:#1d4ed8;background:var(--primary-soft);border-radius:8px;padding:2px 7px}
+    .pool-chip .pc-def.personal{color:#92400e;background:#fef3c7}
+    /* data table (pool management) */
+    .data-table th{text-align:left;padding:10px 12px;font-size:12px;font-weight:800;color:var(--muted);background:#f9fafb;border-bottom:1px solid var(--line)}
+    .data-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--line);vertical-align:middle}
+    .data-table tr:hover td{background:#f9fafb}
+    /* progress compare */
+    .compare-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+    .compare-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    .compare-card .cc-label{font-size:12px;color:var(--muted);font-weight:900}
+    .compare-card .cc-vals{display:flex;align-items:baseline;gap:6px;margin-top:8px;flex-wrap:wrap}
+    .compare-card .cc-from{font-size:14px;color:var(--muted);font-weight:700}
+    .compare-card .cc-arrow{color:var(--muted)}
+    .compare-card .cc-to{font-size:22px;font-weight:950}
+    .compare-card .cc-delta{margin-top:8px;font-size:13px;font-weight:900;display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px}
+    .cc-delta.up{background:#dcfce7;color:#166534}.cc-delta.down{background:#dbeafe;color:#1d4ed8}
+    .cc-delta.bad{background:#fee2e2;color:#991b1b}.cc-delta.flat{background:#f3f4f6;color:#6b7280}
+    .chart-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+    .chart-card h3{margin:0 0 6px;font-size:15px;display:flex;align-items:center;justify-content:space-between}
+    .chart-card .ch-sub{font-size:12px;color:var(--muted);margin-bottom:8px}
+    .chart-card svg{width:100%;height:auto;display:block}
+    @media(max-width:860px){.compare-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:480px){.compare-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}.form-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){.form-grid,.form-grid-2{grid-template-columns:1fr}.booking-item{grid-template-columns:1fr;display:block}.booking-actions{margin-top:10px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div class="brand"><div class="logo">🏋️</div><div><h1>健身私教管理系统</h1><div class="sub">教练端</div></div></div>
+    <div class="header-right">
+      <span class="user-badge" id="userBadge">加载中…</span>
+      <button class="secondary small" onclick="logout()">退出</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('bookings')">📋 约课管理</div>
+    <div class="tab" onclick="switchTab('record')">✏️ 填写记录</div>
+    <div class="tab" onclick="switchTab('pool')">🏋️ 动作库</div>
+    <div class="tab" onclick="switchTab('students')">👥 我的学员</div>
+    <div class="tab" onclick="switchTab('history')">📊 历史记录</div>
+    <div class="tab" onclick="switchTab('progress')">📈 成长对比</div>
+  </div>
+</header>
+
+<!-- 约课管理 -->
+<div id="tab-bookings" class="tab-content active">
+<main>
+  <div class="card" style="margin-bottom:18px">
+    <div class="section-header">
+      <h2>待确认约课 <span class="pill" id="pendingCount">0</span></h2>
+      <button class="secondary small" onclick="loadBookings()">刷新</button>
+    </div>
+    <div id="pendingList"><div class="empty">暂无待确认约课</div></div>
+  </div>
+  <div class="card">
+    <div class="section-header">
+      <h2>已确认课程 <span class="pill" id="confirmedCount">0</span></h2>
+      <input type="date" id="bookingDateFilter" style="width:160px" onchange="loadBookings()">
+    </div>
+    <div id="confirmedList"><div class="empty">暂无已确认课程</div></div>
+  </div>
+</main>
+</div>
+
+<!-- 填写训练记录 -->
+<div id="tab-record" class="tab-content">
+<main>
+  <!-- 选学员 + 关联约课 -->
+  <div class="card" style="margin-bottom:18px">
+    <h2>选择学员 <span class="pill">必填</span></h2>
+    <div class="form-grid-2">
+      <div><label>学员</label><select id="selectStudent" onchange="onStudentChange()"><option value="">-- 请选择学员 --</option></select></div>
+      <div><label>关联约课（可选）</label><select id="selectBooking"><option value="">不关联</option></select></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>基础信息 <span class="pill" id="statusPill">未保存</span></h2>
+      <div class="form-grid">
+        <div><label>日期</label><input type="date" id="dateInput"></div>
+        <div><label>星期</label><input type="text" id="weekdayInput" placeholder="周二"></div>
+        <div><label>训练主题</label><input type="text" id="titleInput" placeholder="下肢 大强度"></div>
+        <div><label>总耗时 分钟</label><input type="number" id="durationInput" min="0" placeholder="60"></div>
+        <div><label>总消耗 kcal</label><input type="number" id="caloriesInput" min="0" placeholder="300"></div>
+        <div><label>体重 kg</label><input type="number" step="0.1" id="weightInput"></div>
+        <div><label>体脂率 %</label><input type="number" step="0.1" id="fatInput"></div>
+        <div><label>骨骼肌 kg</label><input type="number" step="0.1" id="muscleInput"></div>
+      </div>
+      <div class="set-actions">
+        <button class="primary" onclick="saveLog()">保存记录</button>
+        <button class="danger small" onclick="clearForm()">清空</button>
+      </div>
+    </section>
+    <aside class="card"><h2>容量统计 <span class="pill">自动计算</span></h2><div class="stat-grid" id="volumeStats"></div></aside>
+  </div>
+
+  <div style="height:18px"></div>
+
+  <section class="card">
+    <h2>从动作库选择 <span class="pill" id="poolPickerHint">先选学员可套用其历史重量</span></h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <select id="poolCategoryFilter" style="width:auto" onchange="renderPoolPicker()">
+        <option value="">全部部位</option>
+        <option value="lower_body">下肢</option><option value="back">背部</option>
+        <option value="shoulder">肩部</option><option value="chest_arms">胸部/手臂</option>
+        <option value="core">核心</option><option value="other">其他</option>
+      </select>
+      <input type="text" id="poolSearch" placeholder="搜索动作名称…" style="flex:1;min-width:140px" oninput="renderPoolPicker()">
+    </div>
+    <div id="poolPicker" class="pool-picker"></div>
+    <div class="footer-note">点击动作即可加入下方训练列表。已选学员时自动套用该学员上次的重量/次数；否则用动作库默认值。</div>
+  </section>
+
+  <div style="height:18px"></div>
+
+  <section class="card">
+    <h2>新增训练动作 <span class="pill">手动填写</span></h2>
+    <div class="form-grid">
+      <div><label>动作名称</label><input type="text" id="exName" placeholder="悍马机臀冲"></div>
+      <div><label>部位分类</label>
+        <select id="exCategory">
+          <option value="lower_body">下肢</option><option value="back">背部</option>
+          <option value="shoulder">肩部</option><option value="chest_arms">胸部/手臂</option>
+          <option value="core">核心</option><option value="other">其他</option>
+        </select>
+      </div>
+      <div><label>目标肌群</label><input type="text" id="exMuscles" placeholder="臀大肌"></div>
+      <div><label>倍数</label><input type="number" id="defaultMultiplier" value="1" min="0"></div>
+      <div><label>默认重量 kg</label><input type="number" id="defaultWeight" step="0.5"></div>
+      <div><label>默认次数 reps</label><input type="number" id="defaultReps"></div>
+      <div><label>默认组数</label><input type="number" id="defaultSets" placeholder="4"></div>
+    </div>
+    <div class="set-actions"><button class="primary" onclick="addExercise()">添加动作</button></div>
+  </section>
+
+  <div style="height:18px"></div>
+
+  <section class="card">
+    <h2>训练动作列表 <span class="pill" id="exerciseCount">0 个</span></h2>
+    <div id="exerciseList" class="exercise-list"></div>
+    <div id="emptyState" class="empty">还没有训练动作</div>
+  </section>
+
+  <div style="height:18px"></div>
+  <section class="card"><h2>训练总结</h2><textarea id="summaryInput" placeholder="本次训练总结…"></textarea></section>
+</main>
+</div>
+
+<!-- 动作库管理 -->
+<div id="tab-pool" class="tab-content">
+<main>
+  <section class="card" style="margin-bottom:18px">
+    <h2>添加动作到库 <span class="pill">全体教练共享</span></h2>
+    <div class="form-grid">
+      <div><label>动作名称</label><input type="text" id="poolName" placeholder="悍马机臀冲"></div>
+      <div><label>部位分类</label>
+        <select id="poolCategory">
+          <option value="lower_body">下肢</option><option value="back">背部</option>
+          <option value="shoulder">肩部</option><option value="chest_arms">胸部/手臂</option>
+          <option value="core">核心</option><option value="other">其他</option>
+        </select>
+      </div>
+      <div><label>目标肌群</label><input type="text" id="poolMuscles" placeholder="臀大肌"></div>
+      <div><label>倍数</label><input type="number" id="poolMultiplier" value="1" min="0"></div>
+      <div><label>默认重量 kg</label><input type="number" id="poolWeight" step="0.5"></div>
+      <div><label>默认次数 reps</label><input type="number" id="poolReps"></div>
+      <div><label>默认组数</label><input type="number" id="poolSets" placeholder="4"></div>
+    </div>
+    <div class="set-actions">
+      <button class="primary" id="poolSubmitBtn" onclick="submitPool()">加入动作库</button>
+      <button class="secondary small" id="poolCancelBtn" onclick="resetPoolForm()" style="display:none">取消编辑</button>
+    </div>
+  </section>
+  <section class="card">
+    <div class="section-header"><h2>动作库 <span class="pill" id="poolCount">0 个</span></h2><button class="secondary small" onclick="loadPool()">刷新</button></div>
+    <table class="data-table" style="width:100%;border-collapse:collapse">
+      <thead><tr><th>动作</th><th>部位</th><th>目标肌群</th><th>默认</th><th>操作</th></tr></thead>
+      <tbody id="poolBody"><tr><td colspan="5" class="empty">加载中…</td></tr></tbody>
+    </table>
+  </section>
+</main>
+</div>
+
+<!-- 我的学员 -->
+<div id="tab-students" class="tab-content">
+<main>
+  <div class="card">
+    <div class="section-header">
+      <h2>我的学员</h2>
+      <button class="secondary small" onclick="loadStudents()">刷新</button>
+    </div>
+    <div id="studentList"><div class="empty">暂无学员</div></div>
+  </div>
+</main>
+</div>
+
+<!-- 历史记录 -->
+<div id="tab-history" class="tab-content">
+<main>
+  <div class="card">
+    <div class="section-header"><h2>历史训练记录</h2><button class="secondary small" onclick="loadHistory()">刷新</button></div>
+    <div class="form-grid-2" style="margin-bottom:14px">
+      <div><label>按学员筛选</label><select id="historyStudentFilter" onchange="loadHistory()"><option value="">全部学员</option></select></div>
+      <div><label>按月份筛选</label><input type="month" id="historyMonthFilter" onchange="loadHistory()"></div>
+    </div>
+    <div id="historyList"><div class="empty">暂无记录</div></div>
+  </div>
+</main>
+</div>
+
+<!-- 成长对比 -->
+<div id="tab-progress" class="tab-content">
+<main>
+  <div class="card" style="margin-bottom:18px">
+    <h2>成长对比 <span class="pill">前后变化 + 趋势图</span></h2>
+    <div class="form-grid-2">
+      <div><label>选择学员</label><select id="progStudent" onchange="loadProgress()"><option value="">-- 请选择学员 --</option></select></div>
+      <div><label>时间范围</label>
+        <select id="progRange" onchange="renderProgress()">
+          <option value="30">近 1 个月</option>
+          <option value="90">近 3 个月</option>
+          <option value="180">近半年</option>
+          <option value="all" selected>全部</option>
+        </select>
+      </div>
+    </div>
+    <div class="footer-note">对比基于训练记录里填写的体重 / 体脂率 / 骨骼肌，以及每次训练容量。某项缺数据时会自动跳过。后期可在此扩展人体成分（内脏脂肪、基础代谢、节段肌肉等）。</div>
+  </div>
+  <div id="progSummary"></div>
+  <div id="progCharts"></div>
+  <div id="progEmpty" class="card"><div class="empty">请选择学员查看成长对比</div></div>
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const categoryMap={lower_body:{label:'下肢',emoji:'🍗',unit:'kg'},back:{label:'背部',emoji:'🦇',unit:'kg'},shoulder:{label:'肩部',emoji:'🥥',unit:'kg'},chest_arms:{label:'胸部/手臂',emoji:'🛡️',unit:'kg'},core:{label:'核心',emoji:'🍫',unit:'reps'},other:{label:'其他',emoji:'✨',unit:'kg'}};
+let exercises=[], editLogId=null, me=null;
+let pool=[], studentDefaults={}, editPoolId=null;
+
+function weekdayCN(d){if(!d)return'';return['周日','周一','周二','周三','周四','周五','周六'][new Date(d+'T00:00:00').getDay()]||''}
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+function uid(){return 'EX_'+Date.now().toString(36).toUpperCase()}
+function statusLabel(s){const m={pending:'待确认',confirmed:'已确认',completed:'已完课',cancelled:'已取消'};return m[s]||s}
+
+async function api(path,opt={}){
+  const r=await fetch('/api'+path,{headers:{'Content-Type':'application/json'},...opt});
+  const d=await r.json();
+  if(!r.ok)throw new Error(d.error||'请求失败');
+  return d;
+}
+
+async function init(){
+  try{
+    me=await api('/auth/me');
+    document.getElementById('userBadge').textContent='👋 '+me.name+'（教练）';
+    document.getElementById('dateInput').value=todayStr();
+    document.getElementById('weekdayInput').value=weekdayCN(todayStr());
+    document.getElementById('dateInput').addEventListener('change',e=>{document.getElementById('weekdayInput').value=weekdayCN(e.target.value)});
+    await Promise.all([loadBookings(),loadStudentSelects(),loadPool()]);
+    renderStats();
+  }catch(e){location.href='/login.html'}
+}
+
+async function logout(){await api('/auth/logout',{method:'POST'});location.href='/login.html'}
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const names=['bookings','record','pool','students','history','progress'];
+    t.classList.toggle('active',names[i]===name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='pool')loadPool();
+  if(name==='students')loadStudents();
+  if(name==='history')loadHistory();
+}
+
+// ── 约课管理 ──
+async function loadBookings(){
+  try{
+    const date=document.getElementById('bookingDateFilter').value;
+    let all=await api('/bookings'+(date?'?date='+date:''));
+    const pending=all.filter(b=>b.status==='pending');
+    const confirmed=all.filter(b=>b.status==='confirmed');
+    document.getElementById('pendingCount').textContent=pending.length;
+    document.getElementById('confirmedCount').textContent=confirmed.length;
+    document.getElementById('pendingList').innerHTML=pending.length?pending.map(bookingCard).join(''):'<div class="empty">暂无待确认约课</div>';
+    document.getElementById('confirmedList').innerHTML=confirmed.length?confirmed.map(bookingCard).join(''):'<div class="empty">暂无已确认课程</div>';
+  }catch(e){toast('加载约课失败')}
+}
+
+function bookingCard(b){
+  const actions=b.status==='pending'
+    ?`<button class="success small" onclick="updateBooking(${b.id},'confirmed')">确认</button><button class="danger small" onclick="updateBooking(${b.id},'cancelled')">拒绝</button>`
+    :`<button class="primary small" onclick="updateBooking(${b.id},'completed')">标记完课</button><button class="secondary small" onclick="goFillRecord(${b.id},'${b.student_id}','${b.date}')">填写记录</button>`;
+  return`<div class="booking-item"><div>
+    <div class="booking-title">${esc(b.student_name)} <span class="status-badge status-${b.status}">${statusLabel(b.status)}</span></div>
+    <div class="booking-meta">📅 ${b.date} ${b.time_slot}｜${b.note?'备注：'+esc(b.note):''}</div>
+  </div><div class="booking-actions">${actions}</div></div>`;
+}
+
+async function updateBooking(id,status){
+  try{await api('/bookings/'+id+'/status',{method:'PUT',body:JSON.stringify({status})});toast('已更新');loadBookings();}
+  catch(e){toast(e.message)}
+}
+
+function goFillRecord(bookingId,studentId,date){
+  switchTab('record');
+  document.getElementById('selectStudent').value=studentId;
+  onStudentChange();
+  document.getElementById('selectBooking').value=bookingId;
+  document.getElementById('dateInput').value=date;
+  document.getElementById('weekdayInput').value=weekdayCN(date);
+}
+
+// ── 填写记录 ──
+async function loadStudentSelects(){
+  try{
+    const students=await api('/users?role=student');
+    const sel=document.getElementById('selectStudent');
+    const hSel=document.getElementById('historyStudentFilter');
+    const pSel=document.getElementById('progStudent');
+    students.forEach(s=>{
+      sel.innerHTML+=`<option value="${s.id}">${esc(s.name)}</option>`;
+      hSel.innerHTML+=`<option value="${s.id}">${esc(s.name)}</option>`;
+      pSel.innerHTML+=`<option value="${s.id}">${esc(s.name)}</option>`;
+    });
+  }catch(e){}
+}
+
+async function onStudentChange(){
+  const sid=document.getElementById('selectStudent').value;
+  const bSel=document.getElementById('selectBooking');
+  bSel.innerHTML='<option value="">不关联</option>';
+  studentDefaults={};
+  if(!sid){renderPoolPicker();return}
+  try{
+    const [bookings,defs]=await Promise.all([
+      api('/bookings?status=confirmed'),
+      api('/exercises/defaults/'+sid)
+    ]);
+    bookings.filter(b=>String(b.student_id)===String(sid)).forEach(b=>{
+      bSel.innerHTML+=`<option value="${b.id}">${b.date} ${b.time_slot}</option>`;
+    });
+    defs.forEach(d=>{studentDefaults[d.name]=d;});
+  }catch(e){}
+  renderPoolPicker();
+}
+
+async function saveLog(){
+  const sid=document.getElementById('selectStudent').value;
+  if(!sid){toast('请先选择学员');return}
+  const date=document.getElementById('dateInput').value;
+  if(!date){toast('请填写日期');return}
+  const body={
+    student_id:sid,
+    booking_id:document.getElementById('selectBooking').value||null,
+    date,weekday:document.getElementById('weekdayInput').value,
+    title:document.getElementById('titleInput').value,
+    duration:document.getElementById('durationInput').value||null,
+    calories:document.getElementById('caloriesInput').value||null,
+    body_weight:document.getElementById('weightInput').value||null,
+    body_fat:document.getElementById('fatInput').value||null,
+    body_muscle:document.getElementById('muscleInput').value||null,
+    exercises,summary:document.getElementById('summaryInput').value
+  };
+  try{
+    if(editLogId){await api('/logs/'+editLogId,{method:'PUT',body:JSON.stringify(body)});toast('记录已更新');}
+    else{await api('/logs',{method:'POST',body:JSON.stringify(body)});toast('记录已保存');}
+    clearForm();
+  }catch(e){toast(e.message)}
+}
+
+function clearForm(){
+  editLogId=null;
+  ['titleInput','durationInput','caloriesInput','weightInput','fatInput','muscleInput','summaryInput'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('dateInput').value=todayStr();
+  document.getElementById('weekdayInput').value=weekdayCN(todayStr());
+  document.getElementById('statusPill').textContent='未保存';
+  exercises=[];renderExercises();renderStats();
+}
+
+// ── 动作管理（复用个人版逻辑）──
+function exerciseVolume(ex){return(ex.sets||[]).reduce((s,r)=>s+(+r.weight||0)*(+r.reps||0)*(+ex.multiplier||1),0)}
+function exerciseReps(ex){return(ex.sets||[]).reduce((s,r)=>s+(+r.reps||0),0)}
+
+function renderStats(){
+  const totals={lower_body:0,back:0,shoulder:0,chest_arms:0,core:0,other:0};
+  exercises.forEach(ex=>{const v=exerciseVolume(ex),r=exerciseReps(ex);if(ex.category==='core'&&v===0)totals.core+=r;else totals[ex.category||'other']=(totals[ex.category||'other']||0)+v;});
+  const maxKg=Math.max(1,...Object.entries(totals).filter(([k])=>k!=='core').map(([,v])=>v));
+  document.getElementById('volumeStats').innerHTML=Object.entries(categoryMap).map(([k,c])=>{
+    const v=totals[k]||0,pct=k==='core'?Math.min(100,v):Math.round(v/maxKg*100);
+    return`<div class="stat"><div class="name">${c.emoji} ${c.label}</div><div class="num">${Math.round(v)} ${c.unit}</div><div class="bar-wrap"><div class="bar" style="width:${Math.max(3,Math.min(100,pct))}%"></div></div></div>`;
+  }).join('');
+  document.getElementById('exerciseCount').textContent=exercises.length+' 个';
+}
+
+function addExercise(){
+  const name=document.getElementById('exName').value.trim();
+  if(!name){toast('请填写动作名称');return}
+  const w=+document.getElementById('defaultWeight').value||0;
+  const reps=+document.getElementById('defaultReps').value||0;
+  const n=Math.max(1,+document.getElementById('defaultSets').value||1);
+  const ex={id:uid(),name,category:document.getElementById('exCategory').value,
+    muscles:document.getElementById('exMuscles').value,
+    multiplier:Math.max(0,+document.getElementById('defaultMultiplier').value||1),
+    sets:Array.from({length:n},()=>({weight:w,reps,note:''}))};
+  exercises.push(ex);
+  ['exName','exMuscles','defaultWeight','defaultReps','defaultSets'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('defaultMultiplier').value=1;
+  renderExercises();renderStats();toast('动作已添加');
+}
+
+// ── 动作库（动作池）──
+async function loadPool(){
+  try{
+    pool=await api('/exercises');
+    renderPoolPicker();
+    renderPoolTable();
+  }catch(e){}
+}
+
+// 填写记录页：动作池快速选择器
+function renderPoolPicker(){
+  const box=document.getElementById('poolPicker');
+  if(!box)return;
+  const cat=document.getElementById('poolCategoryFilter').value;
+  const kw=(document.getElementById('poolSearch').value||'').trim();
+  const hasStudent=!!document.getElementById('selectStudent').value;
+  document.getElementById('poolPickerHint').textContent=hasStudent?'已套用该学员历史重量':'先选学员可套用其历史重量';
+  let list=pool;
+  if(cat)list=list.filter(e=>e.category===cat);
+  if(kw)list=list.filter(e=>e.name.includes(kw)||(e.muscles||'').includes(kw));
+  if(!list.length){box.innerHTML='<div class="empty">没有匹配的动作。可到「动作库」标签新增。</div>';return}
+  box.innerHTML=list.map(e=>{
+    const cfg=categoryMap[e.category]||categoryMap.other;
+    const sd=studentDefaults[e.name];
+    const w=sd?sd.weight:e.weight, reps=sd?sd.reps:e.reps, sets=sd?sd.sets:e.sets, mult=sd?sd.multiplier:e.multiplier;
+    const defLabel=sd
+      ?`<span class="pc-def personal">该学员 ${w}kg×${reps} ×${sets}组</span>`
+      :`<span class="pc-def">默认 ${w}kg×${reps} ×${sets}组</span>`;
+    return`<div class="pool-chip" onclick="addFromPool(${e.id})">
+      <div class="pc-name">${cfg.emoji} ${esc(e.name)}</div>
+      <div class="pc-meta">${cfg.label}${e.muscles?' · '+esc(e.muscles):''}${(+mult>1)?' · 倍数'+mult:''}</div>
+      ${defLabel}
+    </div>`;
+  }).join('');
+}
+
+function addFromPool(id){
+  const e=pool.find(x=>x.id===id);
+  if(!e)return;
+  const sd=studentDefaults[e.name];
+  const w=+(sd?sd.weight:e.weight)||0;
+  const reps=+(sd?sd.reps:e.reps)||0;
+  const n=Math.max(1,+(sd?sd.sets:e.sets)||1);
+  const mult=Math.max(0,+(sd?sd.multiplier:e.multiplier)||1);
+  exercises.push({id:uid(),name:e.name,category:e.category,muscles:e.muscles||'',multiplier:mult,
+    sets:Array.from({length:n},()=>({weight:w,reps,note:''}))});
+  renderExercises();renderStats();
+  toast((sd?'已按该学员历史加入：':'已加入：')+e.name);
+}
+
+// 动作库管理页：表格 + 增删改
+function renderPoolTable(){
+  const body=document.getElementById('poolBody');
+  if(!body)return;
+  document.getElementById('poolCount').textContent=pool.length+' 个';
+  body.innerHTML=pool.length?pool.map(e=>{
+    const cfg=categoryMap[e.category]||categoryMap.other;
+    return`<tr>
+      <td><b>${esc(e.name)}</b></td>
+      <td>${cfg.emoji} ${cfg.label}</td>
+      <td>${esc(e.muscles||'—')}</td>
+      <td>${e.weight}kg×${e.reps} ×${e.sets}组${(+e.multiplier>1)?'（倍数'+e.multiplier+'）':''}</td>
+      <td><button class="secondary small" onclick="editPoolItem(${e.id})">编辑</button> <button class="danger small" onclick="deletePoolItem(${e.id},'${esc(e.name)}')">删除</button></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="5" class="empty">动作库为空，先在上方添加</td></tr>';
+}
+
+async function submitPool(){
+  const body={
+    name:document.getElementById('poolName').value.trim(),
+    category:document.getElementById('poolCategory').value,
+    muscles:document.getElementById('poolMuscles').value.trim(),
+    multiplier:document.getElementById('poolMultiplier').value||1,
+    weight:document.getElementById('poolWeight').value||0,
+    reps:document.getElementById('poolReps').value||0,
+    sets:document.getElementById('poolSets').value||1,
+  };
+  if(!body.name){toast('请填写动作名称');return}
+  try{
+    if(editPoolId){await api('/exercises/'+editPoolId,{method:'PUT',body:JSON.stringify(body)});toast('动作已更新');}
+    else{await api('/exercises',{method:'POST',body:JSON.stringify(body)});toast('已加入动作库');}
+    resetPoolForm();
+    await loadPool();
+  }catch(e){toast(e.message)}
+}
+
+function editPoolItem(id){
+  const e=pool.find(x=>x.id===id);
+  if(!e)return;
+  editPoolId=id;
+  document.getElementById('poolName').value=e.name;
+  document.getElementById('poolCategory').value=e.category;
+  document.getElementById('poolMuscles').value=e.muscles||'';
+  document.getElementById('poolMultiplier').value=e.multiplier;
+  document.getElementById('poolWeight').value=e.weight;
+  document.getElementById('poolReps').value=e.reps;
+  document.getElementById('poolSets').value=e.sets;
+  document.getElementById('poolSubmitBtn').textContent='保存修改';
+  document.getElementById('poolCancelBtn').style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetPoolForm(){
+  editPoolId=null;
+  ['poolName','poolMuscles','poolWeight','poolReps','poolSets'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('poolMultiplier').value=1;
+  document.getElementById('poolSubmitBtn').textContent='加入动作库';
+  document.getElementById('poolCancelBtn').style.display='none';
+}
+
+async function deletePoolItem(id,name){
+  if(!confirm(`确定从动作库删除「${name}」吗？（不影响已保存的训练记录）`))return;
+  try{await api('/exercises/'+id,{method:'DELETE'});toast('已删除');await loadPool();}
+  catch(e){toast(e.message)}
+}
+
+function renderExercises(){
+  const list=document.getElementById('exerciseList'),emp=document.getElementById('emptyState');
+  emp.style.display=exercises.length?'none':'block';
+  list.innerHTML=exercises.map(ex=>{
+    const cfg=categoryMap[ex.category]||categoryMap.other;
+    const rows=(ex.sets||[]).map((s,i)=>`<tr>
+      <td>第${i+1}组</td>
+      <td><input type="number" step="0.5" value="${esc(s.weight)}" oninput="updSet('${ex.id}',${i},'weight',this.value)"></td>
+      <td><input type="number" value="${esc(s.reps)}" oninput="updSet('${ex.id}',${i},'reps',this.value)"></td>
+      <td><input type="text" value="${esc(s.note||'')}" oninput="updSet('${ex.id}',${i},'note',this.value)"></td>
+      <td><button class="danger small" onclick="delSet('${ex.id}',${i})">删除</button></td></tr>`).join('');
+    return`<article class="exercise"><div class="exercise-head">
+      <div><div class="ex-title">${cfg.emoji} ${esc(ex.name)}</div>
+      <div class="ex-meta"><span class="tag">${cfg.label}</span><span class="tag">容量 ${Math.round(exerciseVolume(ex))} kg</span><span class="tag">次数 ${exerciseReps(ex)} reps</span></div></div>
+      <div><button class="danger small" onclick="delEx('${ex.id}')">删除动作</button></div></div>
+      <div class="exercise-body"><table><thead><tr><th>组数</th><th>重量kg</th><th>次数reps</th><th>备注</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="set-actions"><button class="success small" onclick="addSet('${ex.id}')">添加一组</button></div></div></article>`;
+  }).join('');
+}
+
+function updSet(exId,idx,field,val){const ex=exercises.find(e=>e.id===exId);if(!ex)return;ex.sets[idx][field]=(field==='note'?val:+val)||0;renderStats();}
+function addSet(exId){const ex=exercises.find(e=>e.id===exId);if(!ex)return;const last=ex.sets[ex.sets.length-1]||{weight:0,reps:0,note:''};ex.sets.push({...last});renderExercises();renderStats();}
+function delSet(exId,idx){const ex=exercises.find(e=>e.id===exId);if(!ex)return;ex.sets.splice(idx,1);renderExercises();renderStats();}
+function delEx(exId){exercises=exercises.filter(e=>e.id!==exId);renderExercises();renderStats();}
+
+// ── 我的学员 ──
+async function loadStudents(){
+  try{
+    const list=await api('/users');
+    document.getElementById('studentList').innerHTML=list.length
+      ?list.map(s=>`<div class="student-item">
+        <div><div class="student-name">👤 ${esc(s.name)}</div><div class="student-meta">📱 ${esc(s.phone||'—')} · 加入 ${s.created_at?.slice(0,10)||'—'}</div></div>
+        <button class="primary small" onclick="switchTab('record');document.getElementById('selectStudent').value='${s.id}';onStudentChange()">填写记录</button>
+      </div>`).join('')
+      :'<div class="empty">暂无学员（学员约课后会出现在这里）</div>';
+  }catch(e){toast('加载失败')}
+}
+
+// ── 历史记录 ──
+async function loadHistory(){
+  const sid=document.getElementById('historyStudentFilter').value;
+  const month=document.getElementById('historyMonthFilter').value;
+  let url='/logs?';
+  if(sid)url+='student_id='+sid+'&';
+  if(month)url+='month='+month;
+  try{
+    const logs=await api(url);
+    document.getElementById('historyList').innerHTML=logs.length
+      ?logs.map(l=>`<div class="booking-item">
+        <div><div class="booking-title">${esc(l.date)} ${esc(l.weekday||'')} · ${esc(l.student_name)} · ${esc(l.title||'训练日志')}</div>
+        <div class="booking-meta">动作 ${(l.exercises||[]).length} 个｜耗时 ${l.duration||'—'} min｜消耗 ${l.calories||'—'} kcal</div></div>
+        <div class="booking-actions"><button class="secondary small" onclick="editLog(${l.id})">编辑</button></div>
+      </div>`).join('')
+      :'<div class="empty">暂无记录</div>';
+  }catch(e){toast('加载失败')}
+}
+
+async function editLog(id){
+  try{
+    const l=await api('/logs/'+id);
+    switchTab('record');
+    editLogId=id;
+    document.getElementById('selectStudent').value=l.student_id;
+    await onStudentChange();
+    if(l.booking_id)document.getElementById('selectBooking').value=l.booking_id;
+    document.getElementById('dateInput').value=l.date;
+    document.getElementById('weekdayInput').value=l.weekday||'';
+    document.getElementById('titleInput').value=l.title||'';
+    document.getElementById('durationInput').value=l.duration||'';
+    document.getElementById('caloriesInput').value=l.calories||'';
+    document.getElementById('weightInput').value=l.body_weight||'';
+    document.getElementById('fatInput').value=l.body_fat||'';
+    document.getElementById('muscleInput').value=l.body_muscle||'';
+    document.getElementById('summaryInput').value=l.summary||'';
+    exercises=l.exercises||[];
+    renderExercises();renderStats();
+    document.getElementById('statusPill').textContent='编辑中 #'+id;
+    toast('已载入记录');
+  }catch(e){toast('载入失败')}
+}
+
+// ── 成长对比 ──
+const BODY_METRICS=[
+  {key:'body_weight',label:'体重',unit:'kg',good:'neutral',color:'#2563eb'},
+  {key:'body_fat',label:'体脂率',unit:'%',good:'down',color:'#f59e0b'},
+  {key:'body_muscle',label:'骨骼肌',unit:'kg',good:'up',color:'#16a34a'},
+];
+let progData=[];
+
+async function loadProgress(){
+  const sid=document.getElementById('progStudent').value;
+  if(!sid){progData=[];renderProgress();return}
+  try{progData=await api('/logs/progress/'+sid);}catch(e){progData=[];toast('加载失败');}
+  renderProgress();
+}
+
+function progFilterRange(list){
+  const r=document.getElementById('progRange').value;
+  if(r==='all')return list;
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-Number(r));
+  const cut=cutoff.toISOString().slice(0,10);
+  return list.filter(l=>(l.date||'')>=cut);
+}
+
+function renderProgress(){
+  const sid=document.getElementById('progStudent').value;
+  const summary=document.getElementById('progSummary');
+  const charts=document.getElementById('progCharts');
+  const empty=document.getElementById('progEmpty');
+  const setEmpty=msg=>{summary.innerHTML='';charts.innerHTML='';empty.style.display='block';empty.querySelector('.empty').textContent=msg;};
+  if(!sid)return setEmpty('请选择学员查看成长对比');
+  const list=progFilterRange(progData);
+  if(!list.length)return setEmpty('该时间范围内暂无训练记录');
+  empty.style.display='none';
+
+  // 前后对比卡片
+  const cards=[];
+  BODY_METRICS.forEach(m=>{
+    const pts=list.filter(l=>l[m.key]!=null&&l[m.key]!=='').map(l=>Number(l[m.key]));
+    if(pts.length<1)return;
+    cards.push(compareCard(m.label,m.unit,pts[0],pts[pts.length-1],m.good));
+  });
+  cards.push(compareCard('单次训练容量','kg',list[0].volume,list[list.length-1].volume,'up'));
+  summary.innerHTML='<div class="compare-grid">'+cards.join('')+'</div>';
+
+  // 趋势图
+  let html='';
+  BODY_METRICS.forEach(m=>{
+    const pts=list.filter(l=>l[m.key]!=null&&l[m.key]!=='').map(l=>({x:l.date,y:Number(l[m.key])}));
+    if(pts.length<2)return;
+    html+=`<div class="chart-card"><h3>${m.label}趋势 <span style="font-size:12px;color:var(--muted);font-weight:700">${pts.length} 次测量</span></h3><div class="ch-sub">单位：${m.unit}</div>${lineChartSVG(pts,m.color)}</div>`;
+  });
+  const volPts=list.map(l=>({x:l.date,y:l.volume}));
+  html+=`<div class="chart-card"><h3>每次训练容量 <span style="font-size:12px;color:var(--muted);font-weight:700">${volPts.length} 次</span></h3><div class="ch-sub">单位：kg（重量×次数×倍数累加）</div>${barChartSVG(volPts,'#7c3aed')}</div>`;
+  const hasTrend=BODY_METRICS.some(m=>list.filter(l=>l[m.key]!=null&&l[m.key]!=='').length>=2);
+  if(!hasTrend)html='<div class="card"><div class="empty">体重/体脂/骨骼肌趋势图至少需要 2 次带身体数据的记录。下方为训练容量图。</div></div>'+html;
+  charts.innerHTML=html;
+}
+
+function fmtNum(n){return (Math.round(n*10)/10).toString();}
+function shortDate(d){return d?String(d).slice(5):'';}
+
+function compareCard(label,unit,from,to,good){
+  const delta=to-from, pct=from?delta/from*100:0;
+  let cls='flat',arrow='→';
+  if(Math.abs(delta)>1e-9){
+    arrow=delta>0?'↑':'↓';
+    if(good==='neutral')cls='flat';
+    else if(good==='up')cls=delta>0?'up':'bad';
+    else cls=delta<0?'up':'bad';
+  }
+  const deltaStr=(delta>0?'+':'')+fmtNum(delta)+unit+(from?` (${(pct>0?'+':'')+pct.toFixed(1)}%)`:'');
+  return `<div class="compare-card"><div class="cc-label">${label}</div>
+    <div class="cc-vals"><span class="cc-from">${fmtNum(from)}${unit}</span><span class="cc-arrow">→</span><span class="cc-to">${fmtNum(to)}${unit}</span></div>
+    <div class="cc-delta ${cls}">${arrow} ${deltaStr}</div></div>`;
+}
+
+function lineChartSVG(points,color){
+  const W=620,H=200,padL=46,padR=16,padT=18,padB=30,n=points.length;
+  const ys=points.map(p=>p.y);let min=Math.min(...ys),max=Math.max(...ys);
+  if(min===max){min-=1;max+=1;}else{const r=max-min;min-=r*0.12;max+=r*0.12;}
+  const plotW=W-padL-padR,plotH=H-padT-padB;
+  const xAt=i=>n===1?padL+plotW/2:padL+plotW*i/(n-1);
+  const yAt=v=>padT+plotH*(1-(v-min)/(max-min));
+  let grid='';
+  for(let g=0;g<=2;g++){const v=min+(max-min)*g/2,y=yAt(v);
+    grid+=`<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}" stroke="#eef2ff"/>`;
+    grid+=`<text x="${padL-6}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="10" fill="#9ca3af">${fmtNum(v)}</text>`;}
+  const dLine=points.map((p,i)=>`${i?'L':'M'}${xAt(i).toFixed(1)},${yAt(p.y).toFixed(1)}`).join(' ');
+  const dArea=`${dLine} L${xAt(n-1).toFixed(1)},${(padT+plotH).toFixed(1)} L${xAt(0).toFixed(1)},${(padT+plotH).toFixed(1)} Z`;
+  let dots='';points.forEach((p,i)=>{dots+=`<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(p.y).toFixed(1)}" r="3.5" fill="#fff" stroke="${color}" stroke-width="2"/>`;});
+  const lbl=(i)=>`<text x="${xAt(i).toFixed(1)}" y="${(yAt(points[i].y)-9).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="800" fill="${color}">${fmtNum(points[i].y)}</text>`;
+  let xl='';[...new Set([0,Math.floor((n-1)/2),n-1])].forEach(i=>{xl+=`<text x="${xAt(i).toFixed(1)}" y="${H-10}" text-anchor="middle" font-size="10" fill="#9ca3af">${shortDate(points[i].x)}</text>`;});
+  const gid='g'+Math.random().toString(36).slice(2,7);
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity="0.18"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${dArea}" fill="url(#${gid})"/><path d="${dLine}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${dots}${lbl(0)}${lbl(n-1)}${xl}</svg>`;
+}
+
+function barChartSVG(points,color){
+  const W=620,H=200,padL=46,padR=16,padT=18,padB=30,n=points.length;
+  let max=Math.max(...points.map(p=>p.y),1)*1.14;
+  const plotW=W-padL-padR,plotH=H-padT-padB,slot=plotW/n,bw=Math.min(34,slot*0.6);
+  const yAt=v=>padT+plotH*(1-v/max);
+  let grid='';
+  for(let g=0;g<=2;g++){const v=max*g/2,y=yAt(v);
+    grid+=`<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}" stroke="#eef2ff"/>`;
+    grid+=`<text x="${padL-6}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="10" fill="#9ca3af">${Math.round(v)}</text>`;}
+  let bars='';points.forEach((p,i)=>{const cx=padL+slot*i+slot/2,x=cx-bw/2,y=yAt(p.y),h=padT+plotH-y;
+    bars+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0,h).toFixed(1)}" rx="4" fill="${color}" opacity="0.85"/>`;
+    if(n<=12)bars+=`<text x="${cx.toFixed(1)}" y="${(y-5).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" fill="${color}">${p.y}</text>`;});
+  let xl='';const idxs=n<=8?points.map((_,i)=>i):[...new Set([0,Math.floor((n-1)/2),n-1])];
+  idxs.forEach(i=>{const cx=padL+slot*i+slot/2;xl+=`<text x="${cx.toFixed(1)}" y="${H-10}" text-anchor="middle" font-size="10" fill="#9ca3af">${shortDate(points[i].x)}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${grid}${bars}${xl}</svg>`;
+}
+
+init();
+</script>
+</body>
+</html>

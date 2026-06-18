@@ -1,0 +1,422 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "created_at": "2026/6/15 06:03:57",
+      "name": "老板",
+      "phone": "10000000000",
+      "password": "$2a$10$BlhyvYLYNufBZ4IAsjR3eOnkHk6/otuLIjiN2P7iyNuX9naW94kWO",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "created_at": "2026/6/15 06:03:57",
+      "name": "张教练",
+      "phone": "13800000001",
+      "password": "$2a$10$UbSd1SGPn8xjuRB63Q5DhOcHuvnkiWLHNS5QO4oZWIL7MrdCsz.BO",
+      "role": "coach"
+    },
+    {
+      "id": 3,
+      "created_at": "2026/6/15 06:03:57",
+      "name": "李教练",
+      "phone": "13800000002",
+      "password": "$2a$10$MqJbO4H0cO4oAdpjVDJ6YOApmdRmE2zA9YoA3GVN.HFRpUe.DU2qW",
+      "role": "coach"
+    },
+    {
+      "id": 4,
+      "created_at": "2026/6/15 06:03:57",
+      "name": "小明",
+      "phone": "13900000001",
+      "password": "$2a$10$fzMFpVwbu5y084Yl.jpenOxLxVGRzjOjX7c0WvmyAHY8ZNkkbXJRW",
+      "role": "student"
+    },
+    {
+      "id": 5,
+      "created_at": "2026/6/15 06:03:57",
+      "name": "小红",
+      "phone": "13900000002",
+      "password": "$2a$10$Wi.rvD7svl74XPYgJ0E23eXZbjILY2nENqcxGP7NISA83XQDCdfCe",
+      "role": "student"
+    }
+  ],
+  "bookings": [
+    {
+      "id": 1,
+      "status": "confirmed",
+      "created_at": "2026/6/15 06:04:14",
+      "note": "下肢训练",
+      "student_id": 4,
+      "coach_id": 2,
+      "date": "2026-06-20",
+      "time_slot": "10:00"
+    },
+    {
+      "id": 2,
+      "status": "pending",
+      "created_at": "2026/6/17 23:06:16",
+      "note": "",
+      "student_id": 4,
+      "coach_id": 2,
+      "date": "2026-06-19",
+      "time_slot": "10:00"
+    }
+  ],
+  "logs": [
+    {
+      "id": 1,
+      "created_at": "2026/6/15 09:39:09",
+      "exercises": [
+        {
+          "id": "EX_1",
+          "name": "深蹲",
+          "category": "lower_body",
+          "muscles": "股四头肌、臀大肌",
+          "multiplier": 1,
+          "sets": [
+            {
+              "weight": 30,
+              "reps": 10
+            },
+            {
+              "weight": 35,
+              "reps": 8
+            },
+            {
+              "weight": 40,
+              "reps": 6
+            }
+          ]
+        }
+      ],
+      "summary": "",
+      "student_id": 4,
+      "coach_id": 2,
+      "booking_id": null,
+      "date": "2026-06-15",
+      "weekday": "周日",
+      "title": "下肢",
+      "duration": null,
+      "calories": null,
+      "body_weight": null,
+      "body_fat": null,
+      "body_muscle": null
+    },
+    {
+      "id": 2,
+      "created_at": "2026/6/15 10:40:37",
+      "exercises": [
+        {
+          "name": "深蹲",
+          "category": "lower_body",
+          "multiplier": 1,
+          "sets": [
+            {
+              "weight": 20,
+              "reps": 10
+            },
+            {
+              "weight": 20,
+              "reps": 10
+            },
+            {
+              "weight": 25,
+              "reps": 8
+            }
+          ]
+        }
+      ],
+      "summary": "",
+      "student_id": 4,
+      "coach_id": 2,
+      "booking_id": null,
+      "date": "2026-03-15",
+      "weekday": "周六",
+      "title": "下肢",
+      "duration": null,
+      "calories": null,
+      "body_weight": 62,
+      "body_fat": 28,
+      "body_muscle": 24
+    },
+    {
+      "id": 3,
+      "created_at": "2026/6/15 10:40:37",
+      "exercises": [
+        {
+          "name": "深蹲",
+          "category": "lower_body",
+          "multiplier": 1,
+          "sets": [
+            {
+              "weight": 25,
+              "reps": 10
+            },
+            {
+              "weight": 30,
+              "reps": 10
+            },
+            {
+              "weight": 30,
+              "reps": 8
+            }
+          ]
+        }
+      ],
+      "summary": "",
+      "student_id": 4,
+      "coach_id": 2,
+      "booking_id": null,
+      "date": "2026-04-15",
+      "weekday": "周二",
+      "title": "下肢",
+      "duration": null,
+      "calories": null,
+      "body_weight": 60.5,
+      "body_fat": 26.5,
+      "body_muscle": 24.5
+    },
+    {
+      "id": 4,
+      "created_at": "2026/6/15 10:40:37",
+      "exercises": [
+        {
+          "name": "深蹲",
+          "category": "lower_body",
+          "multiplier": 1,
+          "sets": [
+            {
+              "weight": 30,
+              "reps": 10
+            },
+            {
+              "weight": 35,
+              "reps": 10
+            },
+            {
+              "weight": 35,
+              "reps": 8
+            }
+          ]
+        }
+      ],
+      "summary": "",
+      "student_id": 4,
+      "coach_id": 2,
+      "booking_id": null,
+      "date": "2026-05-15",
+      "weekday": "周四",
+      "title": "下肢",
+      "duration": null,
+      "calories": null,
+      "body_weight": 59,
+      "body_fat": 25,
+      "body_muscle": 25
+    },
+    {
+      "id": 5,
+      "created_at": "2026/6/15 10:40:37",
+      "exercises": [
+        {
+          "name": "深蹲",
+          "category": "lower_body",
+          "multiplier": 1,
+          "sets": [
+            {
+              "weight": 35,
+              "reps": 10
+            },
+            {
+              "weight": 40,
+              "reps": 10
+            },
+            {
+              "weight": 40,
+              "reps": 8
+            }
+          ]
+        }
+      ],
+      "summary": "",
+      "student_id": 4,
+      "coach_id": 2,
+      "booking_id": null,
+      "date": "2026-06-10",
+      "weekday": "周三",
+      "title": "下肢",
+      "duration": null,
+      "calories": null,
+      "body_weight": 58,
+      "body_fat": 23.5,
+      "body_muscle": 25.5
+    }
+  ],
+  "_seq": {
+    "users": 5,
+    "bookings": 2,
+    "logs": 5,
+    "exercises": 12,
+    "student_defaults": 1
+  },
+  "exercises": [
+    {
+      "id": 1,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "悍马机臀冲",
+      "category": "lower_body",
+      "muscles": "臀大肌",
+      "weight": 40,
+      "reps": 10,
+      "sets": 4,
+      "multiplier": 1
+    },
+    {
+      "id": 2,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "坐姿髋外展",
+      "category": "lower_body",
+      "muscles": "臀中肌、臀小肌",
+      "weight": 60,
+      "reps": 16,
+      "sets": 4,
+      "multiplier": 1
+    },
+    {
+      "id": 3,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "罗马尼亚硬拉",
+      "category": "lower_body",
+      "muscles": "腘绳肌、臀大肌、竖脊肌",
+      "weight": 10,
+      "reps": 12,
+      "sets": 4,
+      "multiplier": 2
+    },
+    {
+      "id": 4,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "深蹲",
+      "category": "lower_body",
+      "muscles": "股四头肌、臀大肌",
+      "weight": 15,
+      "reps": 10,
+      "sets": 4,
+      "multiplier": 1
+    },
+    {
+      "id": 5,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "高位下拉",
+      "category": "back",
+      "muscles": "背阔肌",
+      "weight": 30,
+      "reps": 12,
+      "sets": 4,
+      "multiplier": 1
+    },
+    {
+      "id": 6,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "坐姿划船",
+      "category": "back",
+      "muscles": "背阔肌、菱形肌",
+      "weight": 30,
+      "reps": 12,
+      "sets": 4,
+      "multiplier": 1
+    },
+    {
+      "id": 7,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "哑铃推肩",
+      "category": "shoulder",
+      "muscles": "三角肌前束、肱三头肌",
+      "weight": 5,
+      "reps": 12,
+      "sets": 4,
+      "multiplier": 2
+    },
+    {
+      "id": 8,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "侧平举",
+      "category": "shoulder",
+      "muscles": "三角肌中束",
+      "weight": 2.5,
+      "reps": 14,
+      "sets": 4,
+      "multiplier": 2
+    },
+    {
+      "id": 9,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "坐姿推胸",
+      "category": "chest_arms",
+      "muscles": "胸大肌、肱三头肌",
+      "weight": 20,
+      "reps": 12,
+      "sets": 4,
+      "multiplier": 1
+    },
+    {
+      "id": 10,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "卷腹",
+      "category": "core",
+      "muscles": "腹直肌",
+      "weight": 0,
+      "reps": 15,
+      "sets": 3,
+      "multiplier": 1
+    },
+    {
+      "id": 11,
+      "created_by": 2,
+      "created_at": "2026/6/15 09:37:23",
+      "name": "平躺抬腿",
+      "category": "core",
+      "muscles": "下腹部、髂腰肌",
+      "weight": 0,
+      "reps": 12,
+      "sets": 4,
+      "multiplier": 1
+    },
+    {
+      "id": 12,
+      "created_at": "2026/6/15 09:38:21",
+      "multiplier": 2,
+      "name": "保加利亚分腿蹲",
+      "category": "lower_body",
+      "muscles": "股四头肌、臀大肌",
+      "weight": 12,
+      "reps": 12,
+      "sets": 3,
+      "created_by": 2
+    }
+  ],
+  "student_defaults": [
+    {
+      "id": 1,
+      "student_id": 4,
+      "name": "深蹲",
+      "updated_at": "2026/6/15 10:40:37",
+      "category": "lower_body",
+      "muscles": "",
+      "weight": 40,
+      "reps": 10,
+      "sets": 3,
+      "multiplier": 1
+    }
+  ]
+}

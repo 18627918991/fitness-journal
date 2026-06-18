@@ -1,125 +1,61 @@
-# 个人健身训练日志系统
+# 健身私教管理系统
 
-这是一个可以直接部署到 GitHub Pages 的纯静态网页项目。主页面为 `index.html`，不依赖后端、不依赖数据库，训练历史保存在浏览器 `localStorage` 中。
+## 项目目标
+面向小型私教工作室的商业管理系统，支持教练管理学员、约课、填写训练记录，老板可查看全部数据。
 
-## 文件结构
+## 项目状态
+- 创建日期：2026-06-15
+- 当前状态：进行中
 
-```text
-/
-├── index.html
-├── README.md
-├── assets/
-│   └── README_OCR_FILES.md
-└── tessdata/
-    └── README.md
+## 角色说明
+| 角色 | 权限 |
+|------|------|
+| admin（老板）| 查看所有教练/学员/记录/约课 |
+| coach（教练）| 管理自己的学员、确认约课、填写训练记录 |
+| student（学员）| 向教练发起约课、查看自己的训练记录 |
+
+## 目录结构
+```
+project001-健身私教管理系统/
+├── server.js          # Express 主服务
+├── db.js              # SQLite 数据库初始化
+├── package.json
+├── routes/
+│   ├── auth.js        # 登录/登出
+│   ├── users.js       # 用户管理
+│   ├── bookings.js    # 约课
+│   ├── logs.js        # 训练记录
+│   └── exercises.js   # 动作库（动作池）+ 学员默认值
+└── public/
+    ├── login.html     # 登录页
+    ├── coach.html     # 教练端
+    ├── student.html   # 学员端
+    └── admin.html     # 管理端（老板）
 ```
 
-## 如何新建 GitHub 仓库
+## 功能模块
+- **约课系统**：学员发起 → 教练确认 → 完课
+- **训练记录**：教练填写，复用个人版表单（容量统计、组数管理）
+- **动作库（动作池）**：全体教练共享，任意教练可增/改/删动作及默认值
+- **按学员记忆默认值**：保存训练记录时自动把本次用的重量/次数回写为该学员的最新默认值；下次从动作库选该动作时自动套用（按动作名称记忆，每个学员独立）
+- **成长对比**：选学员 + 时间范围，前后变化卡片（体重/体脂率/骨骼肌/训练容量，带↑↓涨跌色）+ 纯 SVG 趋势图（无 CDN 依赖）。教练端在「成长对比」标签，学员端在「我的进步」标签看自己的。后期可在 `BODY_METRICS` 配置 + 记录表单里扩展人体成分（内脏脂肪、基础代谢、节段肌肉等）
 
-1. 登录 GitHub。
-2. 点击右上角 `+`，选择 `New repository`。
-3. 仓库名可以填写 `fitness-log` 或你喜欢的名称。
-4. 选择 `Public`。
-5. 点击 `Create repository`。
-
-## 如何上传这些文件
-
-1. 打开新建好的仓库页面。
-2. 点击 `Add file`。
-3. 选择 `Upload files`。
-4. 上传本项目中的 `index.html`、`README.md`、`assets/`、`tessdata/`。
-5. 点击 `Commit changes`。
-
-如果你使用 Git 命令，也可以在项目目录执行：
-
+## 启动方式
 ```bash
-git init
-git add .
-git commit -m "Add fitness log static site"
-git branch -M main
-git remote add origin https://github.com/你的用户名/仓库名.git
-git push -u origin main
+npm install
+node server.js
+# 访问 http://localhost:3000
 ```
+> 数据存于项目根目录 `data.json`（纯 JSON 文件，无需安装数据库）。
+> 删除 `data.json` 可重置为默认账号 + 示例动作库。
 
-## 如何启用 GitHub Pages
+## 默认账号（初始化后）
+| 账号 | 密码 | 角色 |
+|------|------|------|
+| admin | admin123 | 老板 |
+| coach1 | coach123 | 教练 |
+| student1 | stu123 | 学员 |
 
-1. 进入仓库页面。
-2. 点击 `Settings`。
-3. 左侧点击 `Pages`。
-4. 在 `Build and deployment` 中选择：
-   - Source: `Deploy from a branch`
-   - Branch: `main`
-   - Folder: `/ (root)`
-5. 点击 `Save`。
-6. 等待 1 到 3 分钟，GitHub 会生成 HTTPS 网页链接。
-
-访问链接格式为：
-
-```text
-https://你的用户名.github.io/仓库名/
-```
-
-例如：
-
-```text
-https://yourname.github.io/fitness-log/
-```
-
-## 如何复制链接到微信打开
-
-1. 打开 GitHub Pages 生成的 HTTPS 链接。
-2. 复制浏览器地址栏中的链接。
-3. 发送到微信聊天或文件传输助手。
-4. 在微信中点击链接即可打开使用。
-
-## 如何备份 JSON
-
-网页顶部有 `导出全部 JSON` 按钮。点击后会下载全部历史记录备份文件。
-
-建议定期备份，尤其是在：
-
-- 更换手机或电脑前
-- 清理浏览器缓存前
-- 更换浏览器前
-- 重新部署网页前
-
-## 如何恢复 JSON
-
-点击网页顶部的 `导入恢复 JSON`，选择之前导出的 JSON 文件即可恢复历史记录。
-
-导入会覆盖当前浏览器中的历史记录，请谨慎操作。
-
-## OCR 离线识别需要额外下载哪些文件
-
-如果只使用手动记录、历史记录、周/月总结、JSON 备份恢复，不需要 OCR 文件。
-
-如果需要离线 OCR，请把以下文件放入对应目录：
-
-```text
-assets/tesseract.min.js
-assets/worker.min.js
-assets/tesseract-core.wasm.js
-tessdata/chi_sim.traineddata.gz
-tessdata/eng.traineddata.gz
-```
-
-OCR 文件缺失时，网页其他功能仍然可用。页面会提示：
-
-```text
-OCR 文件未加载，可以手动粘贴识别文字后解析。
-```
-
-详细说明见：
-
-- `assets/README_OCR_FILES.md`
-- `tessdata/README.md`
-
-## 数据保存位置
-
-历史记录保存在浏览器 localStorage 中，key 为：
-
-```text
-hxx_fitness_history_v2
-```
-
-这意味着同一个 GitHub Pages 链接，在不同浏览器或不同手机中数据不会自动同步。需要通过 JSON 导出和导入来迁移。
+## 备注
+- 本地开发阶段，数据存在 fitness_studio.db（SQLite）
+- 后期部署外网时修改 server.js 中 HOST 即可
