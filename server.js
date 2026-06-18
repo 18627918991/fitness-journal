@@ -21,6 +21,16 @@ function lanIP() {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+function loadRoute(name) {
+  try {
+    return require(`./routes/${name}`);
+  } catch (error) {
+    const missingNestedRoute = error.code === 'MODULE_NOT_FOUND' && error.message.includes(`./routes/${name}`);
+    if (!missingNestedRoute) throw error;
+    return require(`./${name}`);
+  }
+}
+
 function parseCookies(header = '') {
   return header.split(';').reduce((cookies, part) => {
     const idx = part.indexOf('=');
@@ -78,11 +88,11 @@ if (isVercel) {
   }));
 }
 
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/bookings', require('./routes/bookings'));
-app.use('/api/logs', require('./routes/logs'));
-app.use('/api/exercises', require('./routes/exercises'));
+app.use('/api/auth', loadRoute('auth'));
+app.use('/api/users', loadRoute('users'));
+app.use('/api/bookings', loadRoute('bookings'));
+app.use('/api/logs', loadRoute('logs'));
+app.use('/api/exercises', loadRoute('exercises'));
 
 // 所有未匹配路由返回登录页
 app.get('*', (req, res) => {
