@@ -22,6 +22,15 @@ function lanIP() {
 app.use(express.json());
 app.use(themedPage);
 app.use(express.static(path.join(__dirname, 'public')));
+app.get('/theme.css', (req, res, next) => {
+  const candidates = [
+    path.join(__dirname, 'public', 'theme.css'),
+    path.join(__dirname, 'theme.css')
+  ];
+  const file = candidates.find(fs.existsSync);
+  if (!file) return next();
+  res.type('css').sendFile(file);
+});
 
 function themedPage(req, res, next) {
   const pageClasses = {
@@ -35,7 +44,14 @@ function themedPage(req, res, next) {
   const bodyClass = pageClasses[req.path] || pageClasses[pagePath];
   if (!bodyClass) return next();
 
-  fs.readFile(path.join(__dirname, 'public', pagePath.slice(1)), 'utf8', (error, html) => {
+  const candidates = [
+    path.join(__dirname, pagePath.slice(1)),
+    path.join(__dirname, 'public', pagePath.slice(1))
+  ];
+  const file = candidates.find(fs.existsSync);
+  if (!file) return next();
+
+  fs.readFile(file, 'utf8', (error, html) => {
     if (error) return next();
     let output = html;
     if (!output.includes('/theme.css')) {
