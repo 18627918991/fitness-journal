@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
@@ -19,7 +20,31 @@ function lanIP() {
 }
 
 app.use(express.json());
+app.use(themedPage);
 app.use(express.static(path.join(__dirname, 'public')));
+
+function themedPage(req, res, next) {
+  const pageClasses = {
+    '/': 'login-page',
+    '/login.html': 'login-page',
+    '/admin.html': 'app-page admin-page',
+    '/coach.html': 'app-page coach-page',
+    '/student.html': 'app-page student-page'
+  };
+  const pagePath = req.path === '/' ? '/login.html' : req.path;
+  const bodyClass = pageClasses[req.path] || pageClasses[pagePath];
+  if (!bodyClass) return next();
+
+  fs.readFile(path.join(__dirname, 'public', pagePath.slice(1)), 'utf8', (error, html) => {
+    if (error) return next();
+    let output = html;
+    if (!output.includes('/theme.css')) {
+      output = output.replace('</style>', '</style>\n  <link rel="stylesheet" href="/theme.css"/>');
+    }
+    output = output.replace('<body>', `<body class="${bodyClass}">`);
+    res.type('html').send(output);
+  });
+}
 
 function loadRoute(name) {
   try {
