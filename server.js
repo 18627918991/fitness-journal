@@ -64,11 +64,11 @@ function themedPage(req, res, next) {
 
 function loadRoute(name) {
   try {
-    return require(`./routes/${name}`);
-  } catch (error) {
-    const missingNestedRoute = error.code === 'MODULE_NOT_FOUND' && error.message.includes(`./routes/${name}`);
-    if (!missingNestedRoute) throw error;
     return require(`./${name}`);
+  } catch (error) {
+    const missingRootRoute = error.code === 'MODULE_NOT_FOUND' && error.message.includes(`./${name}`);
+    if (!missingRootRoute) throw error;
+    return require(`./routes/${name}`);
   }
 }
 

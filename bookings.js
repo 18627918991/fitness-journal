@@ -23,14 +23,26 @@ router.get('/', auth(), (req, res) => {
   res.json(list);
 });
 
-// 学员发起约课
-router.post('/', auth(['student']), (req, res) => {
-  const { coach_id, date, time_slot, note } = req.body;
-  if (!coach_id || !date || !time_slot) return res.status(400).json({ error: '请填写完整约课信息' });
-  const conflict = db.bookings.all({ coach_id: Number(coach_id), date, time_slot })
+// 学员发起约课；教练可手动帮学员约课
+router.post('/', auth(['student', 'coach']), (req, res) => {
+  const me = req.session.user;
+  const { coach_id, student_id, date, time_slot, note } = req.body;
+  const targetCoachId = me.role === 'coach' ? me.id : Number(coach_id);
+  const targetStudentId = me.role === 'coach' ? Number(student_id) : me.id;
+  if (!targetCoachId || !targetStudentId || !date || !time_slot) return res.status(400).json({ error: '请填写完整约课信息' });
+  const student = db.users.find(targetStudentId);
+  if (!student || student.role !== 'student') return res.status(400).json({ error: '学员不存在' });
+  const conflict = db.bookings.all({ coach_id: targetCoachId, date, time_slot })
     .some(b => b.status !== 'cancelled');
   if (conflict) return res.status(400).json({ error: '该时间段已被预约' });
-  const row = db.bookings.insert({ student_id: req.session.user.id, coach_id: Number(coach_id), date, time_slot, note: note || '' });
+  const row = db.bookings.insert({
+    student_id: targetStudentId,
+    coach_id: targetCoachId,
+    date,
+    time_slot,
+    note: note || (me.role === 'coach' ? '教练代约' : ''),
+    status: me.role === 'coach' ? 'confirmed' : 'pending'
+  });
   res.json({ id: row.id });
 });
 
@@ -38,6 +50,9 @@ router.post('/', auth(['student']), (req, res) => {
 router.put('/:id/status', auth(['coach', 'admin']), (req, res) => {
   const { status } = req.body;
   if (!['confirmed', 'completed', 'cancelled'].includes(status)) return res.status(400).json({ error: '状态无效' });
+  const booking = db.bookings.find(Number(req.params.id));
+  if (!booking) return res.status(404).json({ error: '约课不存在' });
+  if (req.session.user.role === 'coach' && booking.coach_id !== req.session.user.id) return res.status(403).json({ error: '无权限' });
   db.bookings.update(Number(req.params.id), { status });
   res.json({ ok: true });
 });

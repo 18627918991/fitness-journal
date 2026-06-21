@@ -263,6 +263,37 @@
 <!-- 我的学员 -->
 <div id="tab-students" class="tab-content">
 <main>
+  <div class="grid" style="margin-bottom:18px">
+    <section class="card">
+      <h2>新增学员 <span class="pill">教练可创建</span></h2>
+      <div class="form-grid-2">
+        <div><label>学员姓名</label><input type="text" id="newStudentName" placeholder="请输入姓名"></div>
+        <div><label>手机号</label><input type="tel" id="newStudentPhone" placeholder="用于登录"></div>
+        <div><label>初始密码</label><input type="text" id="newStudentPassword" value="123456"></div>
+      </div>
+      <div class="set-actions"><button class="primary" onclick="addStudentByCoach()">添加学员</button></div>
+      <div class="footer-note">添加后学员可用手机号和初始密码登录，也会自动出现在你的学员列表中。</div>
+    </section>
+    <section class="card">
+      <h2>帮学员约课 <span class="pill">默认已确认</span></h2>
+      <div class="form-grid-2">
+        <div><label>选择学员</label><select id="manualBookStudent"><option value="">-- 请选择学员 --</option></select></div>
+        <div><label>上课日期</label><input type="date" id="manualBookDate"></div>
+        <div><label>时间段</label>
+          <select id="manualBookTime">
+            <option value="">-- 请选择时间 --</option>
+            <option value="09:00">09:00</option><option value="10:00">10:00</option>
+            <option value="11:00">11:00</option><option value="14:00">14:00</option>
+            <option value="15:00">15:00</option><option value="16:00">16:00</option>
+            <option value="18:00">18:00</option><option value="19:00">19:00</option>
+          </select>
+        </div>
+        <div><label>备注</label><input type="text" id="manualBookNote" placeholder="训练目标或说明"></div>
+      </div>
+      <div class="set-actions"><button class="primary" onclick="createBookingForStudent()">确认约课</button></div>
+      <div class="footer-note">教练代约的课程会直接进入“已确认课程”，避免学员再确认一次。</div>
+    </section>
+  </div>
   <div class="card">
     <div class="section-header">
       <h2>我的学员</h2>
@@ -316,10 +347,11 @@
 <script>
 const categoryMap={lower_body:{label:'下肢',emoji:'🍗',unit:'kg'},back:{label:'背部',emoji:'🦇',unit:'kg'},shoulder:{label:'肩部',emoji:'🥥',unit:'kg'},chest_arms:{label:'胸部/手臂',emoji:'🛡️',unit:'kg'},core:{label:'核心',emoji:'🍫',unit:'reps'},other:{label:'其他',emoji:'✨',unit:'kg'}};
 let exercises=[], editLogId=null, me=null;
-let pool=[], studentDefaults={}, editPoolId=null;
+let pool=[], studentDefaults={}, editPoolId=null, coachStudents=[];
 
 function weekdayCN(d){if(!d)return'';return['周日','周一','周二','周三','周四','周五','周六'][new Date(d+'T00:00:00').getDay()]||''}
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function tomorrowStr(){const d=new Date();d.setDate(d.getDate()+1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
 function uid(){return 'EX_'+Date.now().toString(36).toUpperCase()}
@@ -338,6 +370,7 @@ async function init(){
     document.getElementById('userBadge').textContent='👋 '+me.name+'（教练）';
     document.getElementById('dateInput').value=todayStr();
     document.getElementById('weekdayInput').value=weekdayCN(todayStr());
+    document.getElementById('manualBookDate').value=tomorrowStr();
     document.getElementById('dateInput').addEventListener('change',e=>{document.getElementById('weekdayInput').value=weekdayCN(e.target.value)});
     await Promise.all([loadBookings(),loadStudentSelects(),loadPool()]);
     renderStats();
@@ -400,15 +433,24 @@ function goFillRecord(bookingId,studentId,date){
 async function loadStudentSelects(){
   try{
     const students=await api('/users?role=student');
-    const sel=document.getElementById('selectStudent');
-    const hSel=document.getElementById('historyStudentFilter');
-    const pSel=document.getElementById('progStudent');
-    students.forEach(s=>{
-      sel.innerHTML+=`<option value="${s.id}">${esc(s.name)}</option>`;
-      hSel.innerHTML+=`<option value="${s.id}">${esc(s.name)}</option>`;
-      pSel.innerHTML+=`<option value="${s.id}">${esc(s.name)}</option>`;
-    });
+    syncStudentSelects(students);
   }catch(e){}
+}
+
+function fillStudentSelect(id, students, placeholder){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const current=el.value;
+  el.innerHTML=`<option value="">${placeholder}</option>`+students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+  if(students.some(s=>String(s.id)===String(current)))el.value=current;
+}
+
+function syncStudentSelects(students){
+  coachStudents=students||[];
+  fillStudentSelect('selectStudent',coachStudents,'-- 请选择学员 --');
+  fillStudentSelect('historyStudentFilter',coachStudents,'全部学员');
+  fillStudentSelect('progStudent',coachStudents,'-- 请选择学员 --');
+  fillStudentSelect('manualBookStudent',coachStudents,'-- 请选择学员 --');
 }
 
 async function onStudentChange(){
@@ -639,13 +681,57 @@ function delEx(exId){exercises=exercises.filter(e=>e.id!==exId);renderExercises(
 async function loadStudents(){
   try{
     const list=await api('/users');
+    syncStudentSelects(list);
     document.getElementById('studentList').innerHTML=list.length
       ?list.map(s=>`<div class="student-item">
         <div><div class="student-name">👤 ${esc(s.name)}</div><div class="student-meta">📱 ${esc(s.phone||'—')} · 加入 ${s.created_at?.slice(0,10)||'—'}</div></div>
-        <button class="primary small" onclick="switchTab('record');document.getElementById('selectStudent').value='${s.id}';onStudentChange()">填写记录</button>
+        <div class="booking-actions">
+          <button class="secondary small" onclick="prepareManualBooking(${s.id})">代约课</button>
+          <button class="primary small" onclick="switchTab('record');document.getElementById('selectStudent').value='${s.id}';onStudentChange()">填写记录</button>
+        </div>
       </div>`).join('')
-      :'<div class="empty">暂无学员（学员约课后会出现在这里）</div>';
+      :'<div class="empty">暂无学员（可先在上方新增学员，或为已有学员手动约课）</div>';
   }catch(e){toast('加载失败')}
+}
+
+async function addStudentByCoach(){
+  const name=document.getElementById('newStudentName').value.trim();
+  const phone=document.getElementById('newStudentPhone').value.trim();
+  const password=document.getElementById('newStudentPassword').value.trim()||'123456';
+  if(!name||!phone){toast('请填写学员姓名和手机号');return}
+  try{
+    const student=await api('/users',{method:'POST',body:JSON.stringify({name,phone,password,role:'student'})});
+    toast('学员已添加');
+    document.getElementById('newStudentName').value='';
+    document.getElementById('newStudentPhone').value='';
+    document.getElementById('newStudentPassword').value='123456';
+    await loadStudents();
+    document.getElementById('manualBookStudent').value=student.id;
+  }catch(e){toast(e.message)}
+}
+
+function prepareManualBooking(studentId){
+  document.getElementById('manualBookStudent').value=studentId;
+  document.getElementById('manualBookDate').value=document.getElementById('manualBookDate').value||tomorrowStr();
+  document.getElementById('manualBookDate').focus();
+  toast('已选中学员，可直接约课');
+}
+
+async function createBookingForStudent(){
+  const student_id=document.getElementById('manualBookStudent').value;
+  const date=document.getElementById('manualBookDate').value;
+  const time_slot=document.getElementById('manualBookTime').value;
+  const note=document.getElementById('manualBookNote').value.trim();
+  if(!student_id){toast('请选择学员');return}
+  if(!date){toast('请选择上课日期');return}
+  if(!time_slot){toast('请选择时间段');return}
+  try{
+    await api('/bookings',{method:'POST',body:JSON.stringify({student_id,date,time_slot,note})});
+    toast('约课已创建');
+    document.getElementById('manualBookNote').value='';
+    document.getElementById('manualBookTime').value='';
+    await loadBookings();
+  }catch(e){toast(e.message)}
 }
 
 // ── 历史记录 ──
