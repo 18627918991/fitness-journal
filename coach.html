@@ -336,6 +336,20 @@
     </div>
     <div class="footer-note">对比基于训练记录里填写的体重 / 体脂率 / 骨骼肌，以及每次训练容量。某项缺数据时会自动跳过。后期可在此扩展人体成分（内脏脂肪、基础代谢、节段肌肉等）。</div>
   </div>
+  <div class="card" style="margin-bottom:18px">
+    <h2>录入身体数据 <span class="pill">用于成长对比</span></h2>
+    <div class="form-grid">
+      <div><label>记录日期</label><input type="date" id="bodyMetricDate"></div>
+      <div><label>体重 kg</label><input type="number" step="0.1" id="bodyMetricWeight" placeholder="例如 60.5"></div>
+      <div><label>体脂率 %</label><input type="number" step="0.1" id="bodyMetricFat" placeholder="例如 22.0"></div>
+      <div><label>骨骼肌 kg</label><input type="number" step="0.1" id="bodyMetricMuscle" placeholder="例如 25.2"></div>
+    </div>
+    <div class="set-actions">
+      <button class="primary" onclick="saveBodyMetrics()">保存身体数据</button>
+      <button class="secondary small" onclick="clearBodyMetricForm()">清空</button>
+    </div>
+    <div class="footer-note">先在上方选择学员，再填写身体数据。保存后会生成一条“身体数据记录”，不影响训练容量统计，成长对比图会立即刷新。</div>
+  </div>
   <div id="progSummary"></div>
   <div id="progCharts"></div>
   <div id="progEmpty" class="card"><div class="empty">请选择学员查看成长对比</div></div>
@@ -371,6 +385,7 @@ async function init(){
     document.getElementById('dateInput').value=todayStr();
     document.getElementById('weekdayInput').value=weekdayCN(todayStr());
     document.getElementById('manualBookDate').value=tomorrowStr();
+    document.getElementById('bodyMetricDate').value=todayStr();
     document.getElementById('dateInput').addEventListener('change',e=>{document.getElementById('weekdayInput').value=weekdayCN(e.target.value)});
     await Promise.all([loadBookings(),loadStudentSelects(),loadPool()]);
     renderStats();
@@ -790,6 +805,43 @@ async function loadProgress(){
   if(!sid){progData=[];renderProgress();return}
   try{progData=await api('/logs/progress/'+sid);}catch(e){progData=[];toast('加载失败');}
   renderProgress();
+}
+
+function clearBodyMetricForm(){
+  document.getElementById('bodyMetricDate').value=todayStr();
+  ['bodyMetricWeight','bodyMetricFat','bodyMetricMuscle'].forEach(id=>document.getElementById(id).value='');
+}
+
+async function saveBodyMetrics(){
+  const sid=document.getElementById('progStudent').value;
+  if(!sid){toast('请先选择学员');return}
+  const date=document.getElementById('bodyMetricDate').value;
+  if(!date){toast('请填写记录日期');return}
+  const weight=document.getElementById('bodyMetricWeight').value;
+  const fat=document.getElementById('bodyMetricFat').value;
+  const muscle=document.getElementById('bodyMetricMuscle').value;
+  if(!weight&&!fat&&!muscle){toast('至少填写一项身体数据');return}
+  const body={
+    student_id:sid,
+    booking_id:null,
+    date,
+    weekday:weekdayCN(date),
+    title:'身体数据记录',
+    duration:null,
+    calories:null,
+    body_weight:weight||null,
+    body_fat:fat||null,
+    body_muscle:muscle||null,
+    exercises:[],
+    summary:'教练在成长对比页录入的身体数据'
+  };
+  try{
+    await api('/logs',{method:'POST',body:JSON.stringify(body)});
+    toast('身体数据已保存');
+    clearBodyMetricForm();
+    await loadProgress();
+    loadHistory();
+  }catch(e){toast(e.message)}
 }
 
 function progFilterRange(list){
